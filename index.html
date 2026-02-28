@@ -27,7 +27,7 @@
             align-items: center;
         }
 
-        /* --- EFEK AMBIENT LIGHTING BLEND (DIPERJELAS) --- */
+        /* --- EFEK AMBIENT LIGHTING BLEND --- */
         .ambient-light {
             position: absolute;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -40,9 +40,9 @@
         .glow {
             position: absolute;
             border-radius: 50%;
-            filter: blur(90px); /* Blur dikurangi dikit biar warna lebih nyata */
+            filter: blur(90px); 
             animation: floatOrb 10s infinite alternate ease-in-out;
-            opacity: 0.45; /* Opasitas dinaikkan biar eye-catching */
+            opacity: 0.45; 
         }
 
         .glow-1 {
@@ -60,7 +60,7 @@
 
         .glow-3 {
             width: 45vw; height: 45vh;
-            background: rgba(138, 43, 226, 0.35); /* Warna Indigo/Purple */
+            background: rgba(138, 43, 226, 0.35); 
             top: 25%; left: 30%;
             animation-delay: -6s;
         }
@@ -221,6 +221,35 @@
             letter-spacing: 2px;
             z-index: 100;
         }
+
+        /* --- TOMBOL FULLSCREEN --- */
+        .fs-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-muted);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 1px;
+        }
+
+        .fs-btn:hover {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
     </style>
 </head>
 <body>
@@ -230,6 +259,8 @@
         <div class="glow glow-2"></div>
         <div class="glow glow-3"></div>
     </div>
+
+    <button class="fs-btn" id="fullscreen-btn" onclick="toggleFullScreen()">⛶ FULLSCREEN</button>
 
     <button class="nav-btn prev-btn" onclick="prevSlide()">❮</button>
     <button class="nav-btn next-btn" onclick="nextSlide()">❯</button>
@@ -342,7 +373,7 @@
         const slides = document.querySelectorAll('.slide');
         const progress = document.getElementById('progress');
         let fadeInterval;
-        let isAnimatingNav = false; // Mencegah slide loncat dobel pas di-swipe
+        let isAnimatingNav = false; 
 
         function updateSlide() {
             slides.forEach((slide, index) => {
@@ -353,7 +384,6 @@
             });
             progress.innerText = (currentSlide + 1) + " / " + slides.length;
             
-            // Hentikan semua musik jika ganti slide, biar nggak bocor
             stopAllAudio(null, true); 
         }
 
@@ -371,19 +401,18 @@
             }
         }
 
-        // KONTROL NAVIGASI TRACKPAD MAC & SWIPE
+        // KONTROL NAVIGASI TRACKPAD & SWIPE
         function throttleNav() {
             isAnimatingNav = true;
-            setTimeout(() => { isAnimatingNav = false; }, 600); // Jeda aman biar swipe nggak kebablasan
+            setTimeout(() => { isAnimatingNav = false; }, 600); 
         }
 
-        // Event untuk Trackpad Mac (Scroll Horizontal)
         window.addEventListener('wheel', (e) => {
             if (isAnimatingNav) return;
-            if (e.deltaX > 40) { // Swipe kiri (maju)
+            if (e.deltaX > 40) { 
                 nextSlide();
                 throttleNav();
-            } else if (e.deltaX < -40) { // Swipe kanan (mundur)
+            } else if (e.deltaX < -40) { 
                 prevSlide();
                 throttleNav();
             }
@@ -400,7 +429,7 @@
 
         // KONTROL AUDIO (TOGGLE + FADE IN/OUT)
         function toggleAudio(audioId, btnElement) {
-            stopAllAudio(audioId, false); // Stop lagu lain kalau ada yang nyala
+            stopAllAudio(audioId, false); 
             
             const audio = document.getElementById(audioId);
             if (!audio) return;
@@ -408,7 +437,6 @@
             clearInterval(fadeInterval);
 
             if (audio.paused) {
-                // FADE IN (Mulai Play)
                 audio.volume = 0;
                 audio.play().then(() => {
                     btnElement.innerHTML = "⏸ Hentikan Musik";
@@ -424,7 +452,6 @@
                     alert("Gagal putar musik! Pastikan file lagu1.mp3 dll sudah ada di folder yang sama.");
                 });
             } else {
-                // FADE OUT (Mulai Pause)
                 fadeInterval = setInterval(() => {
                     if (audio.volume > 0.05) {
                         audio.volume -= 0.05;
@@ -450,11 +477,44 @@
                     } else {
                         audio.pause();
                     }
-                    audio.volume = 1; // Reset volume
+                    audio.volume = 1; 
                     if (btns[index]) btns[index].innerHTML = "▶ Putar Musik";
                 }
             });
             clearInterval(fadeInterval);
+        }
+
+        // --- FUNGSI FULLSCREEN ---
+        function toggleFullScreen() {
+            const btn = document.getElementById('fullscreen-btn');
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                // Masuk Fullscreen
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari/Mac */
+                    document.documentElement.webkitRequestFullscreen();
+                }
+                btn.innerHTML = "✖ KELUAR FULLSCREEN";
+            } else {
+                // Keluar Fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari/Mac */
+                    document.webkitExitFullscreen();
+                }
+                btn.innerHTML = "⛶ FULLSCREEN";
+            }
+        }
+
+        // Update teks tombol kalau keluar fullscreen pakai tombol ESC
+        document.addEventListener('fullscreenchange', updateFsButton);
+        document.addEventListener('webkitfullscreenchange', updateFsButton);
+
+        function updateFsButton() {
+            const btn = document.getElementById('fullscreen-btn');
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                btn.innerHTML = "⛶ FULLSCREEN";
+            }
         }
     </script>
 </body>
