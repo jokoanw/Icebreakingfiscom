@@ -7,8 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #070f1f;
-            --bg-gradient: radial-gradient(circle at center, #0d1e38 0%, #03060c 100%);
+            --bg-dark: #03060c;
             --gold: #d4af37;
             --gold-glow: rgba(212, 175, 55, 0.4);
             --white: #ffffff;
@@ -18,7 +17,6 @@
         body {
             margin: 0;
             padding: 0;
-            background: var(--bg-gradient);
             background-color: var(--bg-dark);
             color: var(--white);
             font-family: 'Inter', sans-serif;
@@ -29,20 +27,50 @@
             align-items: center;
         }
 
-        /* Ornamen Cahaya Malam Ramadhan */
-        body::before, body::after {
-            content: '';
+        /* --- EFEK AMBIENT LIGHTING BLEND (BARU) --- */
+        .ambient-light {
             position: absolute;
-            width: 300px;
-            height: 300px;
-            background: var(--gold);
-            filter: blur(150px);
-            opacity: 0.15;
-            z-index: 1;
-            border-radius: 50%;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
         }
-        body::before { top: -100px; left: -100px; }
-        body::after { bottom: -100px; right: -100px; }
+
+        .glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            animation: floatOrb 12s infinite alternate ease-in-out;
+        }
+
+        /* Cahaya Cyan Lembut */
+        .glow-1 {
+            width: 60vw; height: 60vh;
+            background: rgba(0, 243, 255, 0.15);
+            top: -10%; left: -10%;
+        }
+
+        /* Cahaya Emas Elegan */
+        .glow-2 {
+            width: 50vw; height: 50vh;
+            background: rgba(212, 175, 55, 0.15);
+            bottom: -10%; right: -10%;
+            animation-delay: -4s;
+        }
+
+        /* Cahaya Indigo/Purple Gelap untuk transisi warna */
+        .glow-3 {
+            width: 45vw; height: 45vh;
+            background: rgba(100, 50, 255, 0.12);
+            top: 25%; left: 30%;
+            animation-delay: -8s;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(8vw, 8vh) scale(1.15); }
+        }
+        /* ------------------------------------------ */
 
         /* Container Presentasi */
         .slider-container {
@@ -108,12 +136,13 @@
             letter-spacing: 2px;
             margin-bottom: 30px;
             text-transform: uppercase;
+            backdrop-filter: blur(5px);
         }
 
         .emoji-clue {
             font-size: 6rem;
             letter-spacing: 15px;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            text-shadow: 0 10px 30px rgba(0,0,0,0.6);
             margin: 20px 0;
         }
 
@@ -123,7 +152,7 @@
             color: var(--white);
             line-height: 1.6;
             max-width: 800px;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
 
         .lyric-text span {
@@ -172,6 +201,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(5px);
         }
 
         .nav-btn:hover {
@@ -198,6 +228,12 @@
 </head>
 <body>
 
+    <div class="ambient-light">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+    </div>
+
     <button class="nav-btn prev-btn" onclick="prevSlide()">❮</button>
     <button class="nav-btn next-btn" onclick="nextSlide()">❯</button>
     <div class="progress-indicator" id="progress">1 / 16</div>
@@ -208,7 +244,7 @@
             <h1 class="title-gold">ICE BREAKING<br>FISCOM 1447 H</h1>
             <div class="subtitle">TEBAK LAGU! 🎶</div>
             <p style="color: var(--text-muted); margin-top: 30px; font-style: italic;">
-                bersiaplah!
+                Perhatikan layarmu, dengarkan cluenya, dan bersiaplah!
             </p>
         </div>
 
@@ -357,7 +393,7 @@
 
         // Kontrol Audio
         function playAudio(audioId) {
-            stopAllAudio(); // Pastikan gak ada lagu numpuk
+            stopAllAudio(); 
             const audio = document.getElementById(audioId);
             if (audio) {
                 audio.play().catch(error => {
