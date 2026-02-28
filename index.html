@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Breaking FISCOM 1447 H</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070f1f;
+            --bg-gradient: radial-gradient(circle at center, #0d1e38 0%, #03060c 100%);
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --white: #ffffff;
+            --text-muted: #a0aec0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            background-color: var(--bg-dark);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ornamen Cahaya Malam Ramadhan */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--gold);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: 1;
+            border-radius: 50%;
+        }
+        body::before { top: -100px; left: -100px; }
+        body::after { bottom: -100px; right: -100px; }
+
+        /* Container Presentasi */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        /* Tipografi */
+        h1, h2, h3 { font-family: 'Playfair Display', serif; margin: 0; }
+        
+        .title-gold {
+            color: var(--gold);
+            font-size: 4rem;
+            text-shadow: 0 0 20px var(--gold-glow);
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-top: 15px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .level-badge {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .emoji-clue {
+            font-size: 6rem;
+            letter-spacing: 15px;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            margin: 20px 0;
+        }
+
+        .lyric-text {
+            font-size: 2.5rem;
+            font-style: italic;
+            color: var(--white);
+            line-height: 1.6;
+            max-width: 800px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .lyric-text span {
+            color: var(--gold);
+        }
+
+        /* Tombol Audio */
+        .btn-audio {
+            margin-top: 40px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px var(--gold-glow);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-audio:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(212, 175, 55, 0.6);
+            background: #ffe066;
+        }
+
+        /* Navigasi */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-btn:hover {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .prev-btn { left: 30px; }
+        .next-btn { right: 30px; }
+
+        .progress-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="nav-btn prev-btn" onclick="prevSlide()">❮</button>
+    <button class="nav-btn next-btn" onclick="nextSlide()">❯</button>
+    <div class="progress-indicator" id="progress">1 / 16</div>
+
+    <div class="slider-container">
+        
+        <div class="slide active">
+            <h1 class="title-gold">ICE BREAKING<br>FISCOM 1447 H</h1>
+            <div class="subtitle">TEBAK LAGU! 🎶</div>
+            <p style="color: var(--text-muted); margin-top: 30px; font-style: italic;">
+                Perhatikan layarmu, dengarkan cluenya, dan bersiaplah!
+            </p>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 1 • Level 1</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted);">Tebak dari Emoji Ini!</h2>
+            <div class="emoji-clue">🌙 🏃‍♂️ 💨</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 1 • Level 2</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted); margin-bottom: 20px;">Sambung Liriknya...</h2>
+            <div class="lyric-text">"Marhaban Ya Ya Marhaban,<br><span>Marhaban Ya...</span>"</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge" style="border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.1);">JAWABAN</div>
+            <h1 class="title-gold" style="font-size: 3.5rem;">RAMADHAN TIBA</h1>
+            <div class="subtitle">OPICK</div>
+            <audio id="audio1" src="lagu1.mp3"></audio>
+            <button class="btn-audio" onclick="playAudio('audio1')">▶ Putar Musik</button>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 2 • Level 1</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted);">Pecahkan Kode Ini!</h2>
+            <div class="emoji-clue" style="font-family: 'Inter';">Y + 💊 + 🌊</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 2 • Level 2</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted); margin-bottom: 20px;">Nostalgia Masa Kecil...</h2>
+            <div class="lyric-text">"Ya Ali Yabna Abi Thalib,<br><span>Minkumu Mashdarul Mawahib...</span>"</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge" style="border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.1);">JAWABAN</div>
+            <h1 class="title-gold" style="font-size: 3.5rem;">YA THOYBAH</h1>
+            <div class="subtitle">HADDAD ALWI & SULIS</div>
+            <audio id="audio2" src="lagu2.mp3"></audio>
+            <button class="btn-audio" onclick="playAudio('audio2')">▶ Putar Musik</button>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 3 • Level 1</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted);">Apa makna gabungan ini?</h2>
+            <div class="emoji-clue">🌧️ 🌍</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 3 • Level 2</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted); margin-bottom: 20px;">Lagu Sejuta Umat...</h2>
+            <div class="lyric-text">"Habibi Ya Muhammad,<br><span>Ya...</span>"</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge" style="border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.1);">JAWABAN</div>
+            <h1 class="title-gold" style="font-size: 3.5rem;">RAHMATUN LIL'ALAMEEN</h1>
+            <div class="subtitle">MAHER ZAIN</div>
+            <audio id="audio3" src="lagu3.mp3"></audio>
+            <button class="btn-audio" onclick="playAudio('audio3')">▶ Putar Musik</button>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 4 • Level 1</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted);">Baca perlahan emojinya...</h2>
+            <div class="emoji-clue">🛣️ 💓</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 4 • Level 2</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted); margin-bottom: 20px;">Yang baper pasti tau...</h2>
+            <div class="lyric-text">"Aku bersyukur kau di sini kasih,<br><span>di kalbuku mengiringi langkahku...</span>"</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge" style="border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.1);">JAWABAN</div>
+            <h1 class="title-gold" style="font-size: 3.5rem;">SEPANJANG HIDUP</h1>
+            <div class="subtitle">MAHER ZAIN</div>
+            <audio id="audio4" src="lagu4.mp3"></audio>
+            <button class="btn-audio" onclick="playAudio('audio4')">▶ Putar Musik</button>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 5 • Level 1</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted);">Yang sering scroll TikTok pasti hafal!</h2>
+            <div class="emoji-clue" style="font-family: 'Inter';">R + 💃 ✨</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge">Lagu 5 • Level 2</div>
+            <h2 style="font-size: 2rem; color: var(--text-muted); margin-bottom: 20px;">Susah bahasanya? Nih liriknya!</h2>
+            <div class="lyric-text">"Syuf zai gamiilah...<br><span>winti kidaa...</span>"</div>
+        </div>
+
+        <div class="slide">
+            <div class="level-badge" style="border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.1);">JAWABAN</div>
+            <h1 class="title-gold" style="font-size: 3.5rem;">RAY'A</h1>
+            <div class="subtitle">AMR DIAB</div>
+            <audio id="audio5" src="lagu5.mp3"></audio>
+            <button class="btn-audio" onclick="playAudio('audio5')">▶ Putar Musik</button>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progress = document.getElementById('progress');
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+            progress.innerText = (currentSlide + 1) + " / " + slides.length;
+            
+            // Hentikan semua musik jika pindah slide
+            stopAllAudio();
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Navigasi menggunakan keyboard (Kanan/Kiri atau Spasi)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Kontrol Audio
+        function playAudio(audioId) {
+            stopAllAudio(); // Pastikan gak ada lagu numpuk
+            const audio = document.getElementById(audioId);
+            if (audio) {
+                audio.play().catch(error => {
+                    alert("File musik tidak ditemukan! Pastikan file mp3 sudah satu folder dan namanya sesuai (lagu1.mp3, lagu2.mp3, dst).");
+                });
+            }
+        }
+
+        function stopAllAudio() {
+            const audios = document.querySelectorAll('audio');
+            audios.forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+        }
+    </script>
+</body>
+</html>
