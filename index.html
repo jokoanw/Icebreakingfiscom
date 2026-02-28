@@ -486,7 +486,6 @@
 
         // --- FUNGSI FULLSCREEN ---
         function toggleFullScreen() {
-            const btn = document.getElementById('fullscreen-btn');
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 // Masuk Fullscreen
                 if (document.documentElement.requestFullscreen) {
@@ -494,26 +493,19 @@
                 } else if (document.documentElement.webkitRequestFullscreen) { /* Safari/Mac */
                     document.documentElement.webkitRequestFullscreen();
                 }
-                btn.innerHTML = "✖ KELUAR FULLSCREEN";
-            } else {
-                // Keluar Fullscreen
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* Safari/Mac */
-                    document.webkitExitFullscreen();
-                }
-                btn.innerHTML = "⛶ FULLSCREEN";
             }
         }
 
-        // Update teks tombol kalau keluar fullscreen pakai tombol ESC
+        // Sembunyikan tombol kalau layar udah masuk mode fullscreen
         document.addEventListener('fullscreenchange', updateFsButton);
         document.addEventListener('webkitfullscreenchange', updateFsButton);
 
         function updateFsButton() {
             const btn = document.getElementById('fullscreen-btn');
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                btn.innerHTML = "⛶ FULLSCREEN";
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                btn.style.display = 'none'; // Hilang pas fullscreen
+            } else {
+                btn.style.display = 'flex'; // Muncul lagi pas normal
             }
         }
     </script>
